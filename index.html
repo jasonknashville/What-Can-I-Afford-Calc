@@ -188,54 +188,71 @@ RE/MAX 1st Choice
 
 </div>
 
-<script>
-
 function calculate(){
 
-let income=document.getElementById("income").value/12;
+let income = document.getElementById("income").value / 12;
 
-let car=parseFloat(document.getElementById("car").value)||0;
-let cc=parseFloat(document.getElementById("cc").value)||0;
-let other=parseFloat(document.getElementById("other").value)||0;
+let car = parseFloat(document.getElementById("car").value) || 0;
+let cc = parseFloat(document.getElementById("cc").value) || 0;
+let other = parseFloat(document.getElementById("other").value) || 0;
 
-let debts=car+cc+other;
+let debts = car + cc + other;
 
-let rate=document.getElementById("rate").value/100/12;
-let term=document.getElementById("term").value*12;
+let rate = document.getElementById("rate").value / 100 / 12;
+let term = document.getElementById("term").value * 12;
 
-let down=document.getElementById("down").value/100;
+let down = document.getElementById("down").value / 100;
 
-let taxRate=document.getElementById("county").value;
+let taxRate = document.getElementById("county").value;
 
-let insurance=parseFloat(document.getElementById("insurance").value)||150;
+let insurance = parseFloat(document.getElementById("insurance").value) || 150;
 
-let extra=parseFloat(document.getElementById("extra").value)||0;
+let extra = parseFloat(document.getElementById("extra").value) || 0;
 
-let front=income*.36;
-let back=(income*.45)-debts;
+/* DTI limits */
 
-let maxHousing=Math.min(front,back);
+let front = income * .36;
+let back = (income * .45) - debts;
 
-let monthlyPI=maxHousing-insurance;
+let maxHousing = Math.min(front, back);
 
-let loan=monthlyPI*((1-Math.pow(1+rate,-term))/rate);
+if(maxHousing <= 0){
 
-let price=(loan/(1-down))+extra;
+document.getElementById("result").innerHTML =
+"Based on these inputs, debts exceed typical lender qualification limits.";
 
-let taxes=(price*taxRate)/12;
-
-let finalHousing=maxHousing-(taxes+insurance);
-
-loan=finalHousing*((1-Math.pow(1+rate,-term))/rate);
-
-price=(loan/(1-down))+extra;
-
-document.getElementById("result").innerHTML=
-"Estimated Maximum Home Price:<br><b>$"+Math.round(price).toLocaleString()+"</b>";
+return;
 
 }
 
-</script>
+/* Estimate price by solving PITI */
+
+let estimatedTax = 300; // starting estimate
+
+let availablePI = maxHousing - insurance - estimatedTax;
+
+let loan = availablePI * ((1 - Math.pow(1 + rate, -term)) / rate);
+
+let price = loan / (1 - down);
+
+/* refine tax estimate */
+
+estimatedTax = (price * taxRate) / 12;
+
+availablePI = maxHousing - insurance - estimatedTax;
+
+loan = availablePI * ((1 - Math.pow(1 + rate, -term)) / rate);
+
+price = loan / (1 - down) + extra;
+
+if(price < 0){
+price = 0;
+}
+
+document.getElementById("result").innerHTML =
+"Estimated Maximum Home Price:<br><b>$" + Math.round(price).toLocaleString() + "</b>";
+
+}
 
 </body>
 </html>
