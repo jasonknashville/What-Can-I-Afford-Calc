@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>How Much Home Can I Afford</title>
+<title>How Much Home Could You Afford</title>
 
 <style>
 
 body{
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
 background:#f3f4f6;
 margin:0;
 color:#1f2937;
@@ -15,7 +15,12 @@ color:#1f2937;
 
 .top{
 background:#d81f26;
-height:70px;
+padding:20px;
+text-align:center;
+}
+
+.logo{
+max-width:220px;
 }
 
 .container{
@@ -35,7 +40,7 @@ box-shadow:0 4px 15px rgba(0,0,0,.08);
 }
 
 .result-card{
-background:#1f4fa3;
+background:#2d57a5;
 color:white;
 padding:30px;
 border-radius:14px;
@@ -46,9 +51,8 @@ top:40px;
 
 .result-card h3{
 margin:0;
-letter-spacing:.05em;
-font-size:14px;
-font-weight:500;
+font-size:13px;
+letter-spacing:.06em;
 opacity:.9;
 }
 
@@ -59,8 +63,24 @@ margin:10px 0 20px 0;
 }
 
 .result-sub{
-opacity:.9;
 font-size:14px;
+opacity:.9;
+}
+
+.cta{
+display:block;
+margin-top:22px;
+background:white;
+color:#2d57a5;
+text-align:center;
+padding:12px;
+border-radius:6px;
+font-weight:600;
+text-decoration:none;
+}
+
+.cta:hover{
+background:#eef3ff;
 }
 
 h1{
@@ -81,20 +101,6 @@ margin-bottom:16px;
 border-radius:6px;
 border:1px solid #d1d5db;
 font-size:15px;
-}
-
-button{
-background:#d81f26;
-color:white;
-border:none;
-padding:12px 18px;
-font-size:16px;
-border-radius:6px;
-cursor:pointer;
-}
-
-button:hover{
-background:#b91c1c;
 }
 
 .small{
@@ -128,9 +134,14 @@ top:0;
 </style>
 </head>
 
+
 <body>
 
-<div class="top"></div>
+<div class="top">
+<img class="logo"
+src="https://kvcore-library.s3.amazonaws.com/remax1stchoice8207/images/03b9616f75a8e185d56a93c799829fdf.png">
+</div>
+
 
 <div class="container">
 
@@ -141,12 +152,12 @@ top:0;
 <h2>Income</h2>
 
 <label>Annual Household Income</label>
-<input id="income" type="number" placeholder="95000">
+<input id="income" type="number" value="95000">
 
 <h2>Monthly Debts</h2>
 
 <label>Car Payments</label>
-<input id="car" type="number" value="0">
+<input id="car" type="number" value="499">
 
 <label>Credit Card Minimums</label>
 <input id="cc" type="number" value="0">
@@ -189,13 +200,6 @@ Examples: student loans, personal loans, child support, alimony
 
 <h2>Down Payment</h2>
 
-<label>First Time Buyer?</label>
-
-<select id="fthb">
-<option value="yes">Yes</option>
-<option value="no">No</option>
-</select>
-
 <label>Down Payment %</label>
 
 <select id="down">
@@ -207,18 +211,12 @@ Examples: student loans, personal loans, child support, alimony
 <option value="20">20%</option>
 </select>
 
-<h3>Does putting more money down make sense?</h3>
+<h3>Extra Cash Toward Down Payment</h3>
 
-<label>Extra Cash Toward Down Payment</label>
 <input id="extra" type="number" value="0">
 
-<button onclick="calculate()">Calculate</button>
-
 <div class="small">
-
-Estimate based on typical lender DTI guidelines.  
-Not a loan approval. Consult a licensed mortgage professional.
-
+Estimate based on typical lender DTI guidelines. Not a loan approval.
 </div>
 
 </div>
@@ -228,16 +226,17 @@ Not a loan approval. Consult a licensed mortgage professional.
 
 <h3>ESTIMATED BUYING POWER</h3>
 
-<div class="result-price" id="result">
-$0
-</div>
+<div class="result-price" id="result">$0</div>
 
 <div class="result-sub">
-
-Estimated Monthly Housing Budget  
+Estimated Monthly Housing Budget
 <div id="monthlyBudget">$0</div>
-
 </div>
+
+<a class="cta"
+href="https://the-jason-kaczmarski-team-springfield-tn.remax.com/ask/9539cc58d5c28bd9c77d6755120798e0">
+Get My Custom Buying Plan
+</a>
 
 </div>
 
@@ -249,80 +248,95 @@ Jason Kaczmarski • RE/MAX 1st Choice • 615-384-7355
 </div>
 
 
+
 <script>
 
 function calculate(){
 
-let income = document.getElementById("income").value / 12;
-
+let income = parseFloat(document.getElementById("income").value) || 0;
 let car = parseFloat(document.getElementById("car").value) || 0;
 let cc = parseFloat(document.getElementById("cc").value) || 0;
 let other = parseFloat(document.getElementById("other").value) || 0;
 
-let debts = car + cc + other;
+let rate = parseFloat(document.getElementById("rate").value) || 6.15;
+let term = parseInt(document.getElementById("term").value) || 30;
 
-let rate = document.getElementById("rate").value / 100 / 12;
-let term = document.getElementById("term").value * 12;
-
-let down = document.getElementById("down").value / 100;
-
-let taxRate = document.getElementById("county").value;
-
+let taxRate = parseFloat(document.getElementById("county").value) || .0085;
 let insurance = parseFloat(document.getElementById("insurance").value) || 150;
 
+let down = parseFloat(document.getElementById("down").value) || 5;
 let extra = parseFloat(document.getElementById("extra").value) || 0;
 
+let monthlyIncome = income / 12;
 
-/* lender DTI */
+let debts = car + cc + other;
 
-let front = income * .36;
-let back = (income * .45) - debts;
+/* DTI limits */
+
+let front = monthlyIncome * .36;
+let back = (monthlyIncome * .45) - debts;
 
 let maxHousing = Math.min(front, back);
 
 if(maxHousing <= 0){
 
-document.getElementById("result").innerHTML = "$0";
-
-document.getElementById("monthlyBudget").innerHTML =
-"Debts exceed typical lender guidelines";
+document.getElementById("result").innerHTML="$0";
+document.getElementById("monthlyBudget").innerHTML="Debts exceed lender guidelines";
 
 return;
 
 }
 
+/* monthly rate */
+
+let monthlyRate = rate / 100 / 12;
+let payments = term * 12;
+
+/* subtract insurance first */
+
+let availableForPI = maxHousing - insurance;
+
+if(availableForPI <= 0){
+availableForPI = 0;
+}
+
+/* initial loan estimate */
+
+let loan = availableForPI * ((1 - Math.pow(1 + monthlyRate, -payments)) / monthlyRate);
+
+/* convert to price */
+
+let price = loan / (1 - down/100);
 
 /* estimate taxes */
 
-let estimatedTax = 300;
+let monthlyTaxes = (price * taxRate) / 12;
 
-let availablePI = maxHousing - insurance - estimatedTax;
+/* refine loan */
 
-let loan = availablePI * ((1 - Math.pow(1 + rate, -term)) / rate);
+availableForPI = maxHousing - insurance - monthlyTaxes;
 
-let price = loan / (1 - down);
+loan = availableForPI * ((1 - Math.pow(1 + monthlyRate, -payments)) / monthlyRate);
 
-/* refine tax estimate */
+price = loan / (1 - down/100) + extra;
 
-estimatedTax = (price * taxRate) / 12;
-
-availablePI = maxHousing - insurance - estimatedTax;
-
-loan = availablePI * ((1 - Math.pow(1 + rate, -term)) / rate);
-
-price = loan / (1 - down) + extra;
-
-if(price < 0){
-price = 0;
-}
+if(price < 0) price = 0;
 
 document.getElementById("result").innerHTML =
-"$" + Math.round(price).toLocaleString();
+"$"+Math.round(price).toLocaleString();
 
 document.getElementById("monthlyBudget").innerHTML =
-"$" + Math.round(maxHousing).toLocaleString();
+"$"+Math.round(maxHousing).toLocaleString();
 
 }
+
+/* auto calculate */
+
+document.querySelectorAll("input,select").forEach(el=>{
+el.addEventListener("input",calculate);
+});
+
+window.onload = calculate;
 
 </script>
 
